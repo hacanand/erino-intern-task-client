@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+ 
+ 
 import {
   Box,
   TextField,
@@ -6,12 +8,10 @@ import {
   Typography,
   Container,
   Grid2,
- 
 } from "@mui/material";
 import toast from "react-hot-toast";
- 
- 
-
+import axios from 'axios'
+const VITE_APP_BACKEND_URL = import.meta.env.VITE_APP_BACKEND_URL;
 export default function ContactForm() {
   const [formData, setFormData] = useState({
     firstName: "",
@@ -21,7 +21,7 @@ export default function ContactForm() {
     company: "",
     jobTitle: "",
   });
-    const [saving,setSaving]=useState(false)
+  const [saving, setSaving] = useState(false);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -31,26 +31,35 @@ export default function ContactForm() {
     }));
   };
 
-    const handleSubmit = (event) => {
-        setSaving(true)
-        event.preventDefault();
-        try {
-           
-          
+  const handleSubmit = async(event) => {
+    // console.log(formData)
+    setSaving(true);
+    event.preventDefault();
+    try {
+      const res = await axios.post(`${VITE_APP_BACKEND_URL}/contacts`, {
+        firstName:formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phoneNumber: formData.phoneNumber,
+        company: formData.company,
+        jobTitle: formData.jobTitle,
+      });
+      console.log(res)
+      toast.success(res?.data?.message);
       setFormData({
-      firstName: "",
-      lastName: "",
-      email: "",
-      phoneNumber: "",
-      company: "",
-      jobTitle: "",
-    });
-      } catch (error) {
-        console.log(error)
-        } finally {
-          setSaving(false)
-      }
-   
+        firstName: "",
+        lastName: "",
+        email: "",
+        phoneNumber: "",
+        company: "",
+        jobTitle: "",
+      });
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+      // console.log(error);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -129,8 +138,8 @@ export default function ContactForm() {
                 variant="contained"
                 color="primary"
                 fullWidth
-                              size="large"
-                               
+                size="large"
+                // onClick={handleSubmit}
               >
                 Submit
               </Button>
