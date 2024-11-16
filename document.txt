@@ -1,0 +1,3 @@
+Database choice:-
+
+MongoDB is a good choice for a contact management system because it's a NoSQL, document-oriented database. This means data is stored in flexible JSON-like documents, making it easy to adapt to evolving contact information (e.g., adding new fields like social media links without schema migrations). The schema flexibility allows for easy addition of new contact fields as needs change, and the scalability of MongoDB handles growing contact lists efficiently.

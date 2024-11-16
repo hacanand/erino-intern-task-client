@@ -12,13 +12,12 @@ set your mongodb uri in MONGO_URI
 ```bash
 PORT=3001
 MONGO_URI="mongodb+srv://<username>:<password>@cluster0.mt8bp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
- 
-```bash
-
-1. Clone both the repository
-```bash
-git clone
 ```
+
+1. Clone both the repository by running the following command
+```bash
+git clone <repository-url>
+``` 
 2. Install dependencies in both the client and server directories by running the following command
 ```bash
 npm install
