@@ -20,7 +20,7 @@ export default function EditModalForm({ data, setEdited }) {
     company: data.company,
     jobTitle: data.jobTitle,
   });
-  // const [saving, setSaving] = useState(false);
+ 
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -60,9 +60,7 @@ export default function EditModalForm({ data, setEdited }) {
       toast.error(error?.data?.message);
       console.log(error);
     }
-    // } finally {
-    //   setSaving(false);
-    // }
+    
   };
 
   return (
