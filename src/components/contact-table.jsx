@@ -13,7 +13,7 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
-import Checkbox from "@mui/material/Checkbox";
+// import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -21,7 +21,10 @@ import Switch from "@mui/material/Switch";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
-
+import { Button, CircularProgress } from "@mui/material";
+import axios from "axios";
+import { toast } from "react-hot-toast";
+import TransitionsModal from "./edit-modal";
 const VITE_APP_BACKEND_URL = import.meta.env.VITE_APP_BACKEND_URL;
  
  
@@ -81,6 +84,12 @@ const headCells = [
     disablePadding: false,
     label: "Job Title",
   },
+  {
+    id: "actions",
+    numeric: false,
+    disablePadding: false,
+    label: "Actions",
+  }
 ];
 
 function EnhancedTableHead(props) {
@@ -100,7 +109,6 @@ function EnhancedTableHead(props) {
   return (
     <TableHead>
       <TableRow>
-         
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
@@ -112,6 +120,7 @@ function EnhancedTableHead(props) {
               active={orderBy === headCell.id}
               direction={orderBy === headCell.id ? order : "asc"}
               onClick={createSortHandler(headCell.id)}
+              hideSortIcon={headCell.label=='Actions'?true:false}
             >
               {headCell.label}
               {orderBy === headCell.id ? (
@@ -202,10 +211,11 @@ export default function EnhancedTable() {
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [rows, setRows] = React.useState([]);
+  const[edited,setEdited]=React.useState(false)
    React.useEffect(() => {
      fetching();
-
-   }, [ ]);
+     setEdited(false);
+   }, [edited]);
   function fetching() {
     fetch(`${VITE_APP_BACKEND_URL}/contacts`)
       .then((response) => response.json())
@@ -216,6 +226,7 @@ export default function EnhancedTable() {
         console.error("Error:", error);
       });
   }
+  // console.log(rows)
   const handleRequestSort = (_, property) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
@@ -238,7 +249,7 @@ export default function EnhancedTable() {
         selected.slice(0, selectedIndex),
         selected.slice(selectedIndex + 1)
       );
-    }                                                                                   
+    }        
     setSelected(newSelected);
   };
 
@@ -254,7 +265,6 @@ export default function EnhancedTable() {
   const handleChangeDense = (event) => {
     setDense(event.target.checked);
   };
-
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
@@ -264,7 +274,7 @@ export default function EnhancedTable() {
       [...rows]
         .sort(getComparator(order, orderBy))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [order, orderBy, page, rowsPerPage,rows]
+    [order, orderBy, page, rowsPerPage,rows,edited]
   );
   return (
     <Box sx={{ width: "100%" }}>
@@ -285,49 +295,65 @@ export default function EnhancedTable() {
               rowCount={rows.length}
             />
             <TableBody>
-              {visibleRows.map((row, index) => {
-               
-                const isItemSelected = selected.includes(row.id);
-                const labelId = `enhanced-table-checkbox-${index}`;
+              {!rows ? (
+                <CircularProgress className="m-6" />
+              ) : (
+                visibleRows.map((row, index) => {
+                  // const isItemSelected = selected.includes(row.id);
+                  // const labelId = `enhanced-table-checkbox-${index}`;
 
-                return (
-                  <TableRow
-                 
-                    hover
-                    onClick={(event) => handleClick(event, row.id)}
-                    role="checkbox"
-                    aria-checked={isItemSelected}
-                    tabIndex={-1}
-                    key={row.id}
-                    selected={isItemSelected}
-                    sx={{ cursor: "pointer" }}
-                  >
-                    {/* <TableCell padding=" ">
-                      <Checkbox
-                        color="primary"
-                        checked={isItemSelected}
-                        inputProps={{
-                          "aria-labelledby": labelId,
-                        }}
-                      />
-                    </TableCell> */}
-                    <TableCell
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      padding="none"
-                      align="right"
-                    >
-                      {row.firstName}
-                    </TableCell>
-                    <TableCell align="right">{row.lastName}</TableCell>
-                    <TableCell align="right">{row.email}</TableCell>
-                    <TableCell align="right">{row.phoneNumber}</TableCell>
-                    <TableCell align="right">{row.company}</TableCell>
-                    <TableCell align="right">{row.jobTitle}</TableCell>
-                  </TableRow>
-                );
-              })}
+                    return (
+                      <TableRow hover tabIndex={-1} key={row._id}>
+                        <TableCell
+                          component="th"
+                          // id={labelId}
+                          scope="row"
+                          padding="none"
+                          align="right"
+                        >
+                          {row.firstName}
+                        </TableCell>
+                        <TableCell align="right">{row.lastName}</TableCell>
+                        <TableCell align="right">{row.email}</TableCell>
+                        <TableCell align="right">{row.phoneNumber}</TableCell>
+                        <TableCell align="right">{row.company}</TableCell>
+                        <TableCell align="right">{row.jobTitle}</TableCell>
+                        {/* edit button to open edit model*/}
+                        <TableCell align="right">
+                          <div className="flex justify-end gap-2">
+                            <TransitionsModal
+                              data={row}
+                              setEdited={setEdited}
+                            />
+                            {/* delete button */}
+
+                            <Button
+                              color="error"
+                              variant="outlined"
+                              size="small"
+                              onClick={() => {
+                                //  console.log(row._id);
+                                axios
+                                  .delete(
+                                    `${VITE_APP_BACKEND_URL}/contacts/${row._id}`
+                                  )
+                                  .then((res) => {
+                                    toast.success(res?.data?.message);
+                                    fetching();
+                                  })
+                                  .catch((error) => {
+                                    toast.error(error?.response?.data?.message);
+                                  });
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                })
+              )}
               {emptyRows > 0 && (
                 <TableRow
                   style={{

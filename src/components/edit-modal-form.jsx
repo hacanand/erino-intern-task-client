@@ -1,6 +1,5 @@
 import React, { useState } from "react";
- 
- 
+
 import {
   Box,
   TextField,
@@ -10,18 +9,18 @@ import {
   Grid2,
 } from "@mui/material";
 import toast from "react-hot-toast";
-import axios from 'axios'
+import axios from "axios";
 const VITE_APP_BACKEND_URL = import.meta.env.VITE_APP_BACKEND_URL;
-export default function ContactForm() {
+export default function EditModalForm({ data, setEdited }) {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phoneNumber: "",
-    company: "",
-    jobTitle: "",
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    phoneNumber: data.phoneNumber,
+    company: data.company,
+    jobTitle: data.jobTitle,
   });
-  const [saving, setSaving] = useState(false);
+  // const [saving, setSaving] = useState(false);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -30,22 +29,25 @@ export default function ContactForm() {
       [name]: value,
     }));
   };
-
-  const handleSubmit = async(event) => {
+  // console.log(formData)
+  const handleSubmit = async (event) => {
     // console.log(formData)
-    setSaving(true);
+    // setSaving(true);
     event.preventDefault();
     try {
-      const res = await axios.post(`${VITE_APP_BACKEND_URL}/contacts`, {
-        firstName:formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        phoneNumber: formData.phoneNumber,
-        company: formData.company,
-        jobTitle: formData.jobTitle,
-      });
-      console.log(res)
+      const res = await axios.put(
+        `${VITE_APP_BACKEND_URL}/contacts/${data._id}`,
+        {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phoneNumber: formData.phoneNumber,
+          company: formData.company,
+          jobTitle: formData.jobTitle,
+        }
+      );
       toast.success(res?.data?.message);
+      setEdited(true);
       setFormData({
         firstName: "",
         lastName: "",
@@ -55,18 +57,19 @@ export default function ContactForm() {
         jobTitle: "",
       });
     } catch (error) {
-      toast.error(error?.response?.data?.message);
-      // console.log(error);
-    } finally {
-      setSaving(false);
+      toast.error(error?.data?.message);
+      console.log(error);
     }
+    // } finally {
+    //   setSaving(false);
+    // }
   };
 
   return (
     <Container maxWidth="sm">
       <Box sx={{ mt: 4, mb: 4 }}>
         <Typography variant="h4" component="h1" gutterBottom>
-          Contact Form
+          {/* Contact Form */}
         </Typography>
         <form onSubmit={handleSubmit}>
           <Grid2 container spacing={2}>
@@ -141,7 +144,7 @@ export default function ContactForm() {
                 size="large"
                 // onClick={handleSubmit}
               >
-                Submit
+                Update
               </Button>
             </Grid2>
           </Grid2>
