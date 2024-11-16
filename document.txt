@@ -1,3 +1,10 @@
 Database choice:-
 
 MongoDB is a good choice for a contact management system because it's a NoSQL, document-oriented database. This means data is stored in flexible JSON-like documents, making it easy to adapt to evolving contact information (e.g., adding new fields like social media links without schema migrations). The schema flexibility allows for easy addition of new contact fields as needs change, and the scalability of MongoDB handles growing contact lists efficiently.
+
+challenge-
+
+challenges that i have faced during this project development,i have faced issue while configuring tailwind css in vite and issue while running node server and api testing 
+
+        I solve this issue by reading their documentation and
+        taking help from stack overflow and also taking help from my previous github repo
