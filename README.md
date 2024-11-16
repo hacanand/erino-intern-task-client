@@ -39,3 +39,11 @@ http://localhost:3001
 ```
 client will run at port 3000 and server will run at port 3001
 
+
+![Screenshot from 2024-11-16 22-54-00](https://github.com/user-attachments/assets/7088610e-6a99-46d3-a65a-ca5b763ef9c9)
+
+![Screenshot from 2024-11-16 22-54-11](https://github.com/user-attachments/assets/e8b0ce0e-7e4e-43ff-a3c9-90dfd96f9f7b)
+
+![Screenshot from 2024-11-16 22-54-20](https://github.com/user-attachments/assets/04e989d3-7057-4455-b206-bd00bf30095e)
+
+
