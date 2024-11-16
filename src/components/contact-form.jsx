@@ -46,14 +46,14 @@ export default function ContactForm() {
       });
       console.log(res)
       toast.success(res?.data?.message);
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phoneNumber: "",
-        company: "",
-        jobTitle: "",
-      });
+      // setFormData({
+      //   firstName: "",
+      //   lastName: "",
+      //   email: "",
+      //   phoneNumber: "",
+      //   company: "",
+      //   jobTitle: "",
+      // });
     } catch (error) {
       toast.error(error?.response?.data?.message);
       // console.log(error);

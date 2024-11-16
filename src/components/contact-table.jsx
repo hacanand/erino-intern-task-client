@@ -22,26 +22,11 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
 
-function createData(id,firstName, lastName, email, phoneNumber, company, jobTitle) {
-  return {
-    id,
-    firstName,
-    lastName,
-    email,
-    phoneNumber,
-    company,
-    jobTitle,
-  };
-}
-
-const rows = [
-  createData(1, "John", "Doe", "john.doe@example.com", "123-456-7890", "Company A", "Developer"),
-  createData(2, "Jane", "Smith", "jane.smith@example.com", "234-567-8901", "Company B", "Designer"),
-  createData(3, "Alice", "Johnson", "alice.johnson@example.com", "345-678-9012", "Company C", "Manager"),
-  createData(4, "Bob", "Brown", "bob.brown@example.com", "456-789-0123", "Company D", "Analyst"),
-  createData(5, "Charlie", "Davis", "charlie.davis@example.com", "567-890-1234", "Company E", "Engineer"),
-];
-
+const VITE_APP_BACKEND_URL = import.meta.env.VITE_APP_BACKEND_URL;
+ 
+ 
+  
+ 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -57,6 +42,7 @@ function getComparator(order, orderBy) {
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
+//fetching data from the backend
 
 const headCells = [
   {
@@ -98,12 +84,13 @@ const headCells = [
 ];
 
 function EnhancedTableHead(props) {
+  //fet
   const {
-    onSelectAllClick,
+    // onSelectAllClick,
     order,
     orderBy,
-    numSelected,
-    rowCount,
+    // numSelected,
+    // rowCount,
     onRequestSort,
   } = props;
   const createSortHandler = (property) => (event) => {
@@ -113,21 +100,11 @@ function EnhancedTableHead(props) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
-          <Checkbox
-            color="primary"
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{
-              "aria-label": "select all desserts",
-            }}
-          />
-        </TableCell>
+         
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
-            align={headCell.numeric ? "right" : "left"}
+            align={headCell.numeric ? "left" : "right"}
             padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}
           >
@@ -153,7 +130,7 @@ function EnhancedTableHead(props) {
 EnhancedTableHead.propTypes = {
   numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func.isRequired,
+  // onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.oneOf(["asc", "desc"]).isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
@@ -193,7 +170,7 @@ function EnhancedTableToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          Nutrition
+          Contacts
         </Typography>
       )}
       {numSelected > 0 ? (
@@ -219,26 +196,32 @@ EnhancedTableToolbar.propTypes = {
 
 export default function EnhancedTable() {
   const [order, setOrder] = React.useState("asc");
-  const [orderBy, setOrderBy] = React.useState("calories");
+  const [orderBy, setOrderBy] = React.useState("firstName");
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rows, setRows] = React.useState([]);
+   React.useEffect(() => {
+     fetching();
 
-  const handleRequestSort = (event, property) => {
+   }, [ ]);
+  function fetching() {
+    fetch(`${VITE_APP_BACKEND_URL}/contacts`)
+      .then((response) => response.json())
+      .then((data) => {
+        setRows(data?.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+  const handleRequestSort = (_, property) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
-
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelected = rows.map((n) => n.id);
-      setSelected(newSelected);
-      return;
-    }
-    setSelected([]);
-  };
+  // const [contacts, setContacts] = React.useState([]);
 
   const handleClick = (event, id) => {
     const selectedIndex = selected.indexOf(id);
@@ -255,7 +238,7 @@ export default function EnhancedTable() {
         selected.slice(0, selectedIndex),
         selected.slice(selectedIndex + 1)
       );
-    }
+    }                                                                                   
     setSelected(newSelected);
   };
 
@@ -281,9 +264,8 @@ export default function EnhancedTable() {
       [...rows]
         .sort(getComparator(order, orderBy))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [order, orderBy, page, rowsPerPage]
+    [order, orderBy, page, rowsPerPage,rows]
   );
-
   return (
     <Box sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2 }}>
@@ -298,17 +280,19 @@ export default function EnhancedTable() {
               numSelected={selected.length}
               order={order}
               orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
+              // onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
             />
             <TableBody>
               {visibleRows.map((row, index) => {
+               
                 const isItemSelected = selected.includes(row.id);
                 const labelId = `enhanced-table-checkbox-${index}`;
 
                 return (
                   <TableRow
+                 
                     hover
                     onClick={(event) => handleClick(event, row.id)}
                     role="checkbox"
@@ -318,7 +302,7 @@ export default function EnhancedTable() {
                     selected={isItemSelected}
                     sx={{ cursor: "pointer" }}
                   >
-                    <TableCell padding="checkbox">
+                    {/* <TableCell padding=" ">
                       <Checkbox
                         color="primary"
                         checked={isItemSelected}
@@ -326,19 +310,21 @@ export default function EnhancedTable() {
                           "aria-labelledby": labelId,
                         }}
                       />
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell
                       component="th"
                       id={labelId}
                       scope="row"
                       padding="none"
+                      align="right"
                     >
-                      {row.name}
+                      {row.firstName}
                     </TableCell>
-                    <TableCell align="right">{row.calories}</TableCell>
-                    <TableCell align="right">{row.fat}</TableCell>
-                    <TableCell align="right">{row.carbs}</TableCell>
-                    <TableCell align="right">{row.protein}</TableCell>
+                    <TableCell align="right">{row.lastName}</TableCell>
+                    <TableCell align="right">{row.email}</TableCell>
+                    <TableCell align="right">{row.phoneNumber}</TableCell>
+                    <TableCell align="right">{row.company}</TableCell>
+                    <TableCell align="right">{row.jobTitle}</TableCell>
                   </TableRow>
                 );
               })}
